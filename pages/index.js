@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import Head from 'next/head';
 import List from '../components/List'
 import { Container } from '@mui/material';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import PrimarySearchAppBar from '../components/AppBar';
+import PrimarySearchAppBar from '../components/PrimarySearchAppBar';
+import BasicModal from '../components/BasicModal';
+import { GlobalContext } from '../context/GlobalContext';
 
 export default function Home() {
+  const {
+    modal: [_, setOpen],
+  } = useContext(GlobalContext)
   const [bookings, setBookings] = useState([
     {
       meetingName: 'NY Meeting',
@@ -80,10 +85,11 @@ export default function Home() {
         <Container>
           <List bookings={bookings}/>
         </Container>
-        <Fab color="primary" size="large" aria-label="add" sx={{ position: 'fixed', bottom: 20, right: 20 }}>
+        <Fab onClick={() => setOpen(true)} color="primary" size="large" aria-label="add" sx={{ position: 'fixed', bottom: 20, right: 20 }}>
           <AddIcon />
         </Fab>
       </section>
+      <BasicModal />
     </main>
   )
 }

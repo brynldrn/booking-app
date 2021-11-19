@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -6,17 +7,34 @@ import { Button, CardActionArea, CardActions } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from 'dayjs';
+import { GlobalContext } from '../context/GlobalContext';
 
-export default function BookingCard({ meetingName, host, guests, date }) {
+export default function BookingCard({ id, meetingName, host, guests, startDate, endDate, image }) {
+  const {
+    modal: [openEdit, setOpenEdit],
+    deleteModal: [_, setOpen],
+    event: [__, setEvent]
+  } = useContext(GlobalContext)
+
+  const handleDeleteClick = () => {
+    setOpen(true)
+    setEvent(id)
+  }
+
+  const handleEditClick = () => {
+    setOpenEdit(true)
+    setEvent(id)
+  }
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea>
-        <CardMedia
+        {image && (<CardMedia
           component="img"
           height="140"
-          image="https://via.placeholder.com/500x300"
+          image={image}
           alt="card image"
-        />
+        />)}
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {meetingName}
@@ -25,18 +43,21 @@ export default function BookingCard({ meetingName, host, guests, date }) {
             <strong>Host: </strong><span>{host}</span>
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            <strong>Guests: </strong>{guests.map((g, index) => <span key={index}>{`${g}${index !== guests.length - 1 ? ',' : ''} `}</span>)}
+            <strong>Guests: </strong>{guests ? guests.map((g, index) => <span key={index}>{`${g}${index !== guests.length - 1 ? ',' : ''} `}</span>) : 'N/A'}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            <strong>Date: </strong><span>{ dayjs(date).format('MMMM DD, YYYY - hh:mm A') }</span>
+            <strong>Start Date &amp; Time: </strong><span>{ dayjs(startDate).format('MMM DD, YYYY - hh:mm A') }</span>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            <strong>End Date &amp; Time: </strong><span>{ dayjs(endDate).format('MMM DD, YYYY - hh:mm A') }</span>
           </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button color="primary" startIcon={<EditIcon /> }>
+        <Button color="primary" startIcon={<EditIcon />} onClick={handleEditClick}>
           Edit
         </Button>
-        <Button color="error" startIcon={<DeleteIcon />}>
+        <Button color="error" startIcon={<DeleteIcon />} onClick={handleDeleteClick}>
           Delete
         </Button>
       </CardActions>

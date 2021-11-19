@@ -6,90 +6,39 @@ import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import PrimarySearchAppBar from '../components/PrimarySearchAppBar';
 import BasicModal from '../components/BasicModal';
+import DeleteModal from '../components/DeleteModal';
 import { GlobalContext } from '../context/GlobalContext';
+import useSWR from 'swr'
 
 export default function Home() {
   const {
     modal: [_, setOpen],
+    event: [__, setEventId]
   } = useContext(GlobalContext)
-  const [bookings, setBookings] = useState([
-    {
-      meetingName: 'NY Meeting',
-      host: 'Bryan Aldrin',
-      guests: [
-        'Chad',
-        'Giga Chad',
-        'Steve'
-      ],
-      date: new Date()
-    },
-    {
-      meetingName: 'SF Meeting',
-      host: 'Chuck Norris',
-      guests: [
-        'Bob Ross',
-        'Spoderman',
-        'Doge'
-      ],
-      date: new Date()
-    },
-    {
-      meetingName: 'Patry in the USA',
-      host: 'Miley Cyrus',
-      guests: [
-        'Jeff'
-      ],
-      date: new Date()
-    },
-    {
-      meetingName: 'Patry in the USA',
-      host: 'Miley Cyrus',
-      guests: [
-        'Jeff'
-      ],
-      date: new Date()
-    },
-    {
-      meetingName: 'Patry in the USA',
-      host: 'Miley Cyrus',
-      guests: [
-        'Jeff'
-      ],
-      date: new Date()
-    },
-    {
-      meetingName: 'Patry in the USA',
-      host: 'Miley Cyrus',
-      guests: [
-        'Jeff'
-      ],
-      date: new Date()
-    },
-    {
-      meetingName: 'Patry in the USA',
-      host: 'Miley Cyrus',
-      guests: [
-        'Jeff'
-      ],
-      date: new Date()
-    }
-  ])
+
+  // use SWR for now since we are using a mock API
+  const fetcher = (url) => fetch(url).then((res) => res.json())
+  const { data, error } = useSWR('https://61964cdfaf46280017e7df88.mockapi.io/events', fetcher, { refreshInterval: 1000 })
 
   return (
     <main>
       <Head>
-        <title>Bookin App - BAEQ</title>
+        <title>Booking App - BAEQ</title>
       </Head>
       <PrimarySearchAppBar />
       <section style={{ padding: '20px 0' }}>
         <Container>
-          <List bookings={bookings}/>
+          <List bookings={data}/>
         </Container>
-        <Fab onClick={() => setOpen(true)} color="primary" size="large" aria-label="add" sx={{ position: 'fixed', bottom: 20, right: 20 }}>
+        <Fab onClick={() => {
+          setEventId(null)
+          setOpen(true)
+        }} color="primary" size="large" aria-label="add" sx={{ position: 'fixed', bottom: 20, right: 20 }}>
           <AddIcon />
         </Fab>
       </section>
       <BasicModal />
+      <DeleteModal />
     </main>
   )
 }

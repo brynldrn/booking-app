@@ -11,22 +11,30 @@ export default function List({ bookings }) {
     filteredEvents: [filtered, setFiltered],
     page: [currentPage, setCurrentPage],
     pageSize: [currPageSize],
-    searchResults: [searchRes]
+    searchResults: [searchRes],
+    finalData: [finalDataDisplayed, setFinalDataDisplayed]
   } = useContext(GlobalContext)
   const [pageCount, setPageCount] = useState(0)
 
   useEffect(() => {
-    if (events?.length > currPageSize) {
-      setFiltered(events.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)))
+    if (searchRes?.length) {
+
+      if (searchRes?.length > currPageSize) {
+        setFinalDataDisplayed(searchRes.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)))
+      } else {
+        setFinalDataDisplayed(searchRes)
+      }
+
+    } else if (events?.length > currPageSize) {
+      setFinalDataDisplayed(events.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)))
     }
-  }, [currPageSize, currentPage, events, setFiltered])
+  }, [currPageSize, currentPage, events, searchRes, setFinalDataDisplayed])
 
   useEffect(() => {
-    console.log('searchRes => ', searchRes)
     if (searchRes) {
-      setPageCount(Math.ceil(searchRes?.length / currPageSize))
+      setPageCount(Math.ceil(searchRes?.length / currPageSize) || 0)
     } else {
-      setPageCount(Math.ceil(events?.length / currPageSize))
+      setPageCount(Math.ceil(events?.length / currPageSize) || 0)
     }
   }, [searchRes, currPageSize, events])
 
@@ -46,7 +54,7 @@ export default function List({ bookings }) {
         ) }
       </Grid>
       {events?.length > currPageSize && (
-        <Pagination sx={{ '& ul': { justifyContent: 'center' } }} onChange={(e, page) => setCurrentPage(page)} count={pageCount} color="primary" />
+        <Pagination sx={{ '& ul': { justifyContent: 'center' } }} onChange={(e, page) => setCurrentPage(page)} count={pageCount} page={currentPage} color="primary" />
       )}
     </section>
   )

@@ -11,6 +11,7 @@ export const GlobalProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [currentPageSize, setCurrentPageSize] = useState(6)
   const [searchRes, setSearchRes] = useState(null)
+  const [finalDataDisplayed, setFinalDataDisplayed] = useState(null)
 
   const store = {
     modal: [modalState, setModalState],
@@ -20,7 +21,8 @@ export const GlobalProvider = ({ children }) => {
     filteredEvents: [filtered, setFiltered],
     searchResults: [searchRes, setSearchRes],
     page: [currentPage, setCurrentPage],
-    pageSize: [currentPageSize, setCurrentPageSize]
+    pageSize: [currentPageSize, setCurrentPageSize],
+    finalData: [finalDataDisplayed, setFinalDataDisplayed]
   }
 
   return <GlobalContext.Provider value={store}>{children}</GlobalContext.Provider>

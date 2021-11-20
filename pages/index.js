@@ -16,7 +16,8 @@ export default function Home() {
     event: [__, setEventId],
     eventsList: [events, setEvents],
     filteredEvents: [filtered],
-    searchResults: [searchRes]
+    searchResults: [searchRes],
+    finalData: [finalDataDisplayed]
   } = useContext(GlobalContext)
   const [dataToDisplay, setDataToDisplay] = useState(null)
 
@@ -29,8 +30,8 @@ export default function Home() {
   }, [data, setEvents])
 
   useEffect(() => {
-    setDataToDisplay(searchRes || filtered || events)
-  }, [searchRes, filtered, events, setDataToDisplay])
+    setDataToDisplay(finalDataDisplayed || searchRes || filtered || events)
+  }, [searchRes, filtered, events, finalDataDisplayed, setDataToDisplay])
 
   return (
     <main>

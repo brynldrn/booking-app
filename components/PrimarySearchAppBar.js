@@ -63,14 +63,7 @@ export default function PrimarySearchAppBar() {
     const term = event.target.value
     const res = term ? events.filter(e => e.meetingName.toLowerCase().includes(term) || e.host.toLowerCase().includes(term)) : null
 
-    // if (res?.length > currPageSize) {
-    //   setSearchRes(res ? res.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)) : null)
-    // } else {
-    //   setSearchRes(res)
-    // }
-    
     setSearchRes(res)
-
     setCurrentPage(1)
   }
 

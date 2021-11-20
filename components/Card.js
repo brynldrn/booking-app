@@ -47,7 +47,7 @@ export default function BookingCard({ id, meetingName, host, guests, startDate, 
       <CardActionArea>
         <CardContent>
           <Typography variant="body2" color="text.secondary">
-            Meeting Room: <span style={{ textTransform: 'capitalize' }}>{meetingRoom?.replace('/\-/g', ' ')}</span>
+            Meeting Room: <span style={{ textTransform: 'capitalize' }}>{meetingRoom?.replace('-', ' ')}</span>
           </Typography>
         </CardContent>
       </CardActionArea>

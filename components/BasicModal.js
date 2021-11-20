@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { GlobalContext } from '../context/GlobalContext';
 import TextField from '@mui/material/TextField';
-import DateAdapter from '@mui/lab/AdapterDayjs';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import SaveIcon from '@mui/icons-material/Save';
@@ -45,6 +45,9 @@ export default function BasicModal() {
   const [endDate, setEndDate] = useState(new Date());
   const [isLoading, setIsLoading] = useState(false)
   const [sbOpen, setSbOpen] = useState(false)
+  const [sbErrorOpen, setSbErrorOpen] = useState(false)
+  const [isStartDateValid, setIsStartDateValid] = useState(false)
+  const [isEndDateValid, setIsEndDateValid] = useState(false)
   const eventForm = useRef()
 
   const resetForm = () => {
@@ -74,29 +77,35 @@ export default function BasicModal() {
 
   const handleSave = async () => {
     const valid = await eventForm.current.isFormValid()
+    const meetingDuration = Math.round(endDate.getTime() - startDate.getTime()) / 60000;
+    const isMeetingDurationValid = meetingDuration >= 30 && meetingDuration <= 60;
 
-    if (valid) {
-      setIsLoading(true)
-      fetch(`https://61964cdfaf46280017e7df88.mockapi.io/events/${eventId || ''}`, {
-        method: eventId ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          meetingName,
-          host,
-          guests,
-          startDate,
-          endDate
-        })
-      }).then(res => {
-        setIsLoading(false)
-        resetForm()
-        setOpen(false)
-        setSbOpen(true)
+    if (valid && isStartDateValid && isEndDateValid) {
+      if (isMeetingDurationValid) {
+        setIsLoading(true)
+        fetch(`https://61964cdfaf46280017e7df88.mockapi.io/events/${eventId || ''}`, {
+          method: eventId ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            meetingName,
+            host,
+            guests,
+            startDate,
+            endDate
+          })
+        }).then(res => {
+          setIsLoading(false)
+          resetForm()
+          setOpen(false)
+          setSbOpen(true)
 
-        return res.json()
-      }).catch(err => console.error(err))
+          return res.json()
+        }).catch(err => console.error(err))
+      } else {
+        setSbErrorOpen(true)
+      }
     }
   }
 
@@ -163,19 +172,24 @@ export default function BasicModal() {
               </Box>
               <Button variant="outlined" startIcon={<Add />} onClick={handleAddGuest}>Add a guest</Button>
               <Box mt={5} >
-                <LocalizationProvider dateAdapter={DateAdapter}>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateTimePicker
                     renderInput={(props) => <TextField {...props} />}
                     label="Start Date and Time"
                     value={startDate}
                     onChange={(newValue) => {
-                      setStartDate(newValue);
+                      setStartDate(newValue)
                     }}
+                    minDate={new Date()}
+                    minTime={new Date(0, 0, 0, 8)}
+                    maxTime={new Date(0, 0, 0, 17, 1)}
+                    onAccept={() => setIsStartDateValid(true)}
+                    onError={() => setIsStartDateValid(false)}
                   />
                 </LocalizationProvider>
               </Box>
               <Box mt={5} mb={5} >
-                <LocalizationProvider dateAdapter={DateAdapter}>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateTimePicker
                     renderInput={(props) => <TextField {...props} />}
                     label="End Date and Time"
@@ -183,6 +197,11 @@ export default function BasicModal() {
                     onChange={(newValue) => {
                       setEndDate(newValue);
                     }}
+                    minDate={startDate}
+                    minTime={new Date(0, 0, 0, 8, 30)}
+                    maxTime={new Date(0, 0, 0, 18, 1)}
+                    onAccept={() => setIsEndDateValid(true)}
+                    onError={() => setIsEndDateValid(false)}
                   />
                 </LocalizationProvider>
               </Box>
@@ -203,6 +222,11 @@ export default function BasicModal() {
       <Snackbar open={sbOpen} autoHideDuration={2000} onClose={() => setSbOpen(false)}>
         <Alert onClose={() => setSbOpen(false)} severity="success" sx={{ width: '100%' }}>
           { eventId ? 'Successfully Updated!' : 'Successfully Created!' }
+        </Alert>
+      </Snackbar>
+      <Snackbar open={sbErrorOpen} autoHideDuration={2000} onClose={() => setSbErrorOpen(false)}>
+        <Alert onClose={() => setSbErrorOpen(false)} severity="error" sx={{ width: '100%' }}>
+          Meeting duration should be at least 30 minutes and not more than an hour.
         </Alert>
       </Snackbar>
     </div>

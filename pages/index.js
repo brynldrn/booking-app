@@ -23,7 +23,7 @@ export default function Home() {
 
   // use SWR for now since we are using a mock API
   const fetcher = (url) => fetch(url).then((res) => res.json())
-  const { data, error } = useSWR('https://61964cdfaf46280017e7df88.mockapi.io/events', fetcher)
+  const { data, error } = useSWR('https://61964cdfaf46280017e7df88.mockapi.io/events', fetcher, { revalidateIfStale: true, revalidateOnFocus: true, refreshInterval: 5000 })
 
   useEffect(() => {
     setEvents(data)

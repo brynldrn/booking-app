@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import { GlobalContext } from '../context/GlobalContext';
+import { LensTwoTone } from '@mui/icons-material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -53,13 +54,24 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function PrimarySearchAppBar() {
   const {
     eventsList: [events],
-    filteredEvents: [_, setFilteredEvents]
+    searchResults: [_, setSearchRes],
+    page: [currentPage, setCurrentPage],
+    pageSize: [currPageSize],
   } = useContext(GlobalContext)
 
   const handleSearch = (event) => {
     const term = event.target.value
-    const filteredEvents = term ? events.filter(e => e.meetingName.toLowerCase().includes(term) || e.host.toLowerCase().includes(term)) : events
-    setFilteredEvents(filteredEvents)
+    const res = term ? events.filter(e => e.meetingName.toLowerCase().includes(term) || e.host.toLowerCase().includes(term)) : null
+
+    // if (res?.length > currPageSize) {
+    //   setSearchRes(res ? res.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)) : null)
+    // } else {
+    //   setSearchRes(res)
+    // }
+    
+    setSearchRes(res)
+
+    setCurrentPage(1)
   }
 
   return (

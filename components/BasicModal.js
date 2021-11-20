@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import FormGroup from '@mui/material/FormGroup';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -13,6 +13,10 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator'
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Add from '@mui/icons-material/Add';
+import Delete from '@mui/icons-material/Delete';
+import Grid from '@mui/material/Grid';
 
 const style = {
   position: 'absolute',
@@ -36,17 +40,17 @@ export default function BasicModal() {
   } = useContext(GlobalContext)
   const [meetingName, setMeetingName] = useState('')
   const [host, setHost] = useState('')
-  const [guests, setGuests] = useState([])
+  const [guests, setGuests] = useState([''])
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [isFormValid, setIsFormValid] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [sbOpen, setSbOpen] = useState(false)
+  const eventForm = useRef()
 
   const resetForm = () => {
     setMeetingName('')
     setHost('')
-    setGuests([])
+    setGuests([''])
     setStartDate(new Date())
     setEndDate(new Date())
   }
@@ -58,17 +62,20 @@ export default function BasicModal() {
     .then(res => res.json())
     .then(data => {
       const { meetingName, host, guests, startDate, endDate } = data;
+
       setMeetingName(meetingName)
       setHost(host)
-      setGuests(guests)
+      setGuests(guests || [''])
       setStartDate(startDate)
       setEndDate(endDate)
     })
     .catch(err => console.error(err))
   }, [eventId])
 
-  const handleSave = () => {
-    if (isFormValid) {
+  const handleSave = async () => {
+    const valid = await eventForm.current.isFormValid()
+
+    if (valid) {
       setIsLoading(true)
       fetch(`https://61964cdfaf46280017e7df88.mockapi.io/events/${eventId || ''}`, {
         method: eventId ? 'PUT' : 'POST',
@@ -87,9 +94,28 @@ export default function BasicModal() {
         resetForm()
         setOpen(false)
         setSbOpen(true)
+
         return res.json()
       }).catch(err => console.error(err))
     }
+  }
+
+  const handleGuestsChange = (e, index) => {
+    const _guests = [...guests];
+    _guests[index] = e.target.value;
+
+    setGuests([..._guests])
+  }
+
+  const handleAddGuest = () => {
+    setGuests([...guests, ''])
+  }
+
+  const handleRemoveGuest = (index) => {
+    const _guests = [...guests];
+    _guests.splice(index, 1);
+
+    setGuests([..._guests])
   }
   
   const handleModalClose = () => {
@@ -110,7 +136,7 @@ export default function BasicModal() {
           </Typography>
           <ValidatorForm
             onSubmit={handleSave}
-            onError={errors => setIsFormValid(errors.length)}
+            ref={eventForm}
           >
             <FormGroup>
               <TextValidator onChange={(e) => setMeetingName(e.target.value)} style={{ width: '100%' }} value={meetingName} id="meetingName" name="meetingName" validators={['required']} errorMessages={['this field is required']} label="Meeting Name" variant="standard" />
@@ -118,8 +144,25 @@ export default function BasicModal() {
               <Typography sx={{ mt: 2 }} variant="h6" component="p">
                 Guests:
               </Typography>
-              <TextField id="guest" name="guest" label="Guest" variant="standard" />
-              <Box sx={{ mt: 5}} >
+              <TextValidator onChange={(e) => handleGuestsChange(e, 0)} value={guests[0]} style={{ width: '100%' }} id="guest-0" name="guest-0" validators={['required']} errorMessages={['this field is required']} label="Guest 1" variant="standard" />
+              <Box mt={1} mb={3}>
+                {
+                  guests && guests?.length >= 2 && guests?.map((field, index) => {
+                    return index !== 0 ? (
+                      <Grid key={index} container alignContent="center" alignItems="center" justifyContent="space-between">
+                        <Grid item xs={8}>
+                          <TextValidator style={{ width: '100%' }} onChange={(e) => handleGuestsChange(e, index)} value={guests[index]} id={`guest-${index + 1}`} name={`guest-${index + 1}`} validators={['required']} errorMessages={['this field is required']} label={`Guest ${index + 1}`} variant="standard" />
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Button variant="outlined" color="error" startIcon={<Delete />} onClick={() => handleRemoveGuest(index)}>Remove</Button>
+                        </Grid>
+                      </Grid>
+                    ) : null
+                  })
+                }
+              </Box>
+              <Button variant="outlined" startIcon={<Add />} onClick={handleAddGuest}>Add a guest</Button>
+              <Box mt={5} >
                 <LocalizationProvider dateAdapter={DateAdapter}>
                   <DateTimePicker
                     renderInput={(props) => <TextField {...props} />}
@@ -131,7 +174,7 @@ export default function BasicModal() {
                   />
                 </LocalizationProvider>
               </Box>
-              <Box sx={{ mt: 5, mb: 5 }} >
+              <Box mt={5} mb={5} >
                 <LocalizationProvider dateAdapter={DateAdapter}>
                   <DateTimePicker
                     renderInput={(props) => <TextField {...props} />}
@@ -145,7 +188,6 @@ export default function BasicModal() {
               </Box>
               <LoadingButton
                 color="primary"
-                onClick={handleSave}
                 loading={isLoading}
                 loadingPosition="start"
                 startIcon={<SaveIcon />}

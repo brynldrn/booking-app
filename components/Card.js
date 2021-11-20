@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from 'dayjs';
 import { GlobalContext } from '../context/GlobalContext';
 
-export default function BookingCard({ id, meetingName, host, guests, startDate, endDate, image }) {
+export default function BookingCard({ id, meetingName, host, guests, startDate, endDate, meetingRoom }) {
   const {
     modal: [openEdit, setOpenEdit],
     deleteModal: [_, setOpen],
@@ -28,28 +28,27 @@ export default function BookingCard({ id, meetingName, host, guests, startDate, 
 
   return (
     <Card sx={{ maxWidth: 345 }}>
+      <CardContent>
+        <Typography gutterBottom variant="h5" component="div">
+          {meetingName}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <strong>Host: </strong><span>{host}</span>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <strong>Guests: </strong>{guests ? guests.map((g, index) => <span key={index}>{`${g}${index !== guests.length - 1 ? ',' : ''} `}</span>) : 'N/A'}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <strong>Start Date &amp; Time: </strong><span>{ dayjs(startDate).format('MMM DD, YYYY - hh:mm A') }</span>
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          <strong>End Date &amp; Time: </strong><span>{ dayjs(endDate).format('MMM DD, YYYY - hh:mm A') }</span>
+        </Typography>
+      </CardContent>
       <CardActionArea>
-        {image && (<CardMedia
-          component="img"
-          height="140"
-          image={image}
-          alt="card image"
-        />)}
         <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {meetingName}
-          </Typography>
           <Typography variant="body2" color="text.secondary">
-            <strong>Host: </strong><span>{host}</span>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Guests: </strong>{guests ? guests.map((g, index) => <span key={index}>{`${g}${index !== guests.length - 1 ? ',' : ''} `}</span>) : 'N/A'}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Start Date &amp; Time: </strong><span>{ dayjs(startDate).format('MMM DD, YYYY - hh:mm A') }</span>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>End Date &amp; Time: </strong><span>{ dayjs(endDate).format('MMM DD, YYYY - hh:mm A') }</span>
+            Meeting Room: <span style={{ textTransform: 'capitalize' }}>{meetingRoom?.replace('/\-/g', ' ')}</span>
           </Typography>
         </CardContent>
       </CardActionArea>

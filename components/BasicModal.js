@@ -17,6 +17,10 @@ import Button from '@mui/material/Button';
 import Add from '@mui/icons-material/Add';
 import Delete from '@mui/icons-material/Delete';
 import Grid from '@mui/material/Grid';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 const style = {
   position: 'absolute',
@@ -49,6 +53,13 @@ export default function BasicModal() {
   const [isStartDateValid, setIsStartDateValid] = useState(false)
   const [isEndDateValid, setIsEndDateValid] = useState(false)
   const eventForm = useRef()
+  const meetingRooms = [
+    { label: 'New York', slug: 'new-york' },
+    { label: 'Manila', slug: 'manila' },
+    { label: 'New Zealand', slug: 'new-zealand' },
+    { label: 'Japan', slug: 'japan' },
+  ]
+  const [meetingRoom, setMeetingRoom] = useState('new-york')
 
   const resetForm = () => {
     setMeetingName('')
@@ -56,6 +67,7 @@ export default function BasicModal() {
     setGuests([''])
     setStartDate(new Date())
     setEndDate(new Date())
+    setMeetingRoom('')
   }
 
   useEffect(() => {
@@ -64,13 +76,14 @@ export default function BasicModal() {
     })
     .then(res => res.json())
     .then(data => {
-      const { meetingName, host, guests, startDate, endDate } = data;
+      const { meetingName, host, guests, startDate, endDate, meetingRoom } = data;
 
       setMeetingName(meetingName)
       setHost(host)
       setGuests(guests || [''])
       setStartDate(startDate)
       setEndDate(endDate)
+      setMeetingRoom(meetingRoom)
     })
     .catch(err => console.error(err))
   }, [eventId])
@@ -93,7 +106,8 @@ export default function BasicModal() {
             host,
             guests,
             startDate,
-            endDate
+            endDate,
+            meetingRoom
           })
         }).then(res => {
           setIsLoading(false)
@@ -140,7 +154,7 @@ export default function BasicModal() {
         aria-labelledby="modal-modal-title"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
+          <Typography mb={2} id="modal-modal-title" variant="h6" component="h2">
             Add a new event
           </Typography>
           <ValidatorForm
@@ -148,6 +162,19 @@ export default function BasicModal() {
             ref={eventForm}
           >
             <FormGroup>
+              <FormControl fullWidth>
+                <InputLabel id="meetingRoom">Meeting Room</InputLabel>
+                <Select
+                  labelId="meetingRoom"
+                  value={meetingRoom}
+                  label="Meeting Room"
+                  onChange={(e) => setMeetingRoom(e.target.value)}
+                >
+                  {
+                    meetingRooms.map((room, index) => <MenuItem key={index + room.slug} value={room.slug}>{room.label}</MenuItem>)
+                  }
+                </Select>
+              </FormControl>
               <TextValidator onChange={(e) => setMeetingName(e.target.value)} style={{ width: '100%' }} value={meetingName} id="meetingName" name="meetingName" validators={['required']} errorMessages={['this field is required']} label="Meeting Name" variant="standard" />
               <TextValidator onChange={(e) => setHost(e.target.value)} value={host} style={{ width: '100%' }} id="host" name="host" validators={['required']} errorMessages={['this field is required']} label="Host" variant="standard" />
               <Typography sx={{ mt: 2 }} variant="h6" component="p">

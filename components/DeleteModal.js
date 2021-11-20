@@ -22,7 +22,7 @@ const style = {
 export default function DeleteModal() {
   const {
     deleteModal: [open, setOpen],
-    event: [eventId]
+    event: [eventId, setEventId]
   } = useContext(GlobalContext)
   const [sbOpen, setSbOpen] = useState(false)
   
@@ -38,6 +38,7 @@ export default function DeleteModal() {
     .then(() => {
       handleModalClose()
       setSbOpen(true)
+      setEventId(null)
     })
     .catch(err => console.error(err))
   }

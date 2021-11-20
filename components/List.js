@@ -14,7 +14,7 @@ export default function List({ bookings }) {
         )) : (
         <Grid item xs={10}>
           <Typography variant="h4" sx={{ marginTop: 10 }}>
-            No bookings yet!
+            No bookings found!
           </Typography>
         </Grid>
       ) }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -8,6 +8,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import { GlobalContext } from '../context/GlobalContext';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -50,6 +51,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function PrimarySearchAppBar() {
+  const {
+    eventsList: [events],
+    filteredEvents: [_, setFilteredEvents]
+  } = useContext(GlobalContext)
+
+  const handleSearch = (event) => {
+    const term = event.target.value
+    const filteredEvents = term ? events.filter(e => e.meetingName.toLowerCase().includes(term) || e.host.toLowerCase().includes(term)) : events
+    setFilteredEvents(filteredEvents)
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -78,6 +90,7 @@ export default function PrimarySearchAppBar() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              onChange={handleSearch}
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect } from 'react'
 import Head from 'next/head';
 import List from '../components/List'
 import { Container } from '@mui/material';
@@ -13,12 +13,18 @@ import useSWR from 'swr'
 export default function Home() {
   const {
     modal: [_, setOpen],
-    event: [__, setEventId]
+    event: [__, setEventId],
+    eventsList: [events, setEvents],
+    filteredEvents: [filtered]
   } = useContext(GlobalContext)
 
   // use SWR for now since we are using a mock API
   const fetcher = (url) => fetch(url).then((res) => res.json())
   const { data, error } = useSWR('https://61964cdfaf46280017e7df88.mockapi.io/events', fetcher, { refreshInterval: 1000 })
+
+  useEffect(() => {
+    setEvents(data)
+  }, [data, setEvents])
 
   return (
     <main>
@@ -28,7 +34,7 @@ export default function Home() {
       <PrimarySearchAppBar />
       <section style={{ padding: '20px 0' }}>
         <Container>
-          <List bookings={data}/>
+          <List bookings={filtered || events}/>
         </Container>
         <Fab onClick={() => {
           setEventId(null)

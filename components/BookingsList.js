@@ -19,6 +19,8 @@ export default function BookingsList({ bookings }) {
   } = useContext(GlobalContext)
   const [pageCount, setPageCount] = useState(0)
 
+  // this block of logic decides what to be shown in the listing
+  // by default, search results take priority
   useEffect(() => {
     if (searchRes?.length) {
 
@@ -53,6 +55,7 @@ export default function BookingsList({ bookings }) {
     }
   }, [currPageSize, currentPage, events, searchRes, setFinalDataDisplayed, filtered, isFilterActive, dateRange, dateFilteredData])
 
+  // this method ensures that no matter what the active cards are shown, the page numbers in the pagination are accurate
   useEffect(() => {
     if (searchRes) {
       setPageCount(Math.ceil(searchRes?.length / currPageSize) || 0)

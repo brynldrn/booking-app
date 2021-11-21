@@ -70,6 +70,7 @@ export default function BasicModal() {
     setMeetingRoom('')
   }
 
+  // gets the event based on the ID and automatically appends them to each state
   useEffect(() => {
     eventId && fetch(`https://61964cdfaf46280017e7df88.mockapi.io/events/${eventId}`, {
       method: 'GET'
@@ -95,6 +96,7 @@ export default function BasicModal() {
     const meetingDuration = Math.round(endDate.getTime() - startDate.getTime()) / 60000;
     const isMeetingDurationValid = meetingDuration >= 30 && meetingDuration <= 60;
 
+    // Save and Update are handled here both by conditional HTTP method
     if (valid && isStartDateValid && isEndDateValid) {
       if (isMeetingDurationValid) {
         setIsLoading(true)

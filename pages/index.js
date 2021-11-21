@@ -54,10 +54,12 @@ export default function Home() {
   const fetcher = (url) => fetch(url).then((res) => res.json())
   const { data, error } = useSWR('https://61964cdfaf46280017e7df88.mockapi.io/events', fetcher, { revalidateIfStale: true, revalidateOnFocus: true, refreshInterval: 5000 })
 
+  // sets initial events to be loaded
   useEffect(() => {
     setEvents(data)
   }, [data, setEvents])
 
+  // decides what cards to display after the user clicks on any page features
   useEffect(() => {
     setDataToDisplay(finalDataDisplayed || searchRes || filtered || events)
   }, [searchRes, filtered, events, finalDataDisplayed, setDataToDisplay])
@@ -74,6 +76,7 @@ export default function Home() {
     setIsDrawerOpen(open);
   };
 
+  // filters the events cards based on the Meeting Room filters
   useEffect(() => {
     const flags = Object.keys(roomFilters).filter(room => roomFilters[room])
     const filtered = flags && flags.length ? events.filter(event => flags.includes(event.meetingRoom)) : null
@@ -83,6 +86,8 @@ export default function Home() {
     setCurrentPage(1)
   }, [roomFilters, events, setFiltered, setIsFilterActive, setCurrentPage])
 
+  // filters the event cards based on the value of the Date Range Picker.
+  // this will not execute unless the date range is complete
   useEffect(() => {
     if (!dateRange.includes(null)) {
       const filtered = events.filter(event => {
@@ -123,8 +128,6 @@ export default function Home() {
         <Box
           sx={{ width: { xs: 340, sm: 400 } }}
           role="presentation"
-          // onClick={toggleDrawer(false)}
-          // onKeyDown={toggleDrawer(false)}
         >
           <List>
             <ListItem>

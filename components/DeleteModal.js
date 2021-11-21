@@ -29,7 +29,7 @@ export default function DeleteModal() {
   const handleModalClose = () => {
     setOpen(false)
   }
-
+  
   const handleConfirm = () => {
     eventId && fetch(`https://61964cdfaf46280017e7df88.mockapi.io/events/${eventId}`, {
       method: 'DELETE'

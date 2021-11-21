@@ -65,6 +65,8 @@ export default function PrimarySearchAppBar({ back, slug }) {
 
   const router = useRouter()
 
+  // search function which fires for each character typed by the user,
+  // IDEALLY, this should be DEBOUNCED but I don't have the time to implement it now.
   const handleSearch = (event) => {
     const term = event.target.value
     let res;

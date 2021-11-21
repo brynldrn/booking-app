@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import BookingCard from './Card'
 import { useEffect, useState } from 'react';
 
+// This function is a mirror of BookingsList but without the tedious data manipulation since I'm expecting a single source of data here
 export default function RoomBookingsList({ bookings }) {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageCount, setPageCount] = useState(0)

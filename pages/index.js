@@ -20,6 +20,14 @@ import FormGroup from '@mui/material/FormGroup';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { DateRangePickerDay, StaticDateRangePicker } from '@mui/lab';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import ClearAll from '@mui/icons-material/ClearAll';
+import dayjs from 'dayjs';
 
 export default function Home() {
   const {
@@ -32,9 +40,15 @@ export default function Home() {
     finalData: [finalDataDisplayed],
     drawer: [isDrawerOpen, setIsDrawerOpen],
     room: [roomFilters, setRoomFilters],
-    filterActive: [isFilterActive, setIsFilterActive]
+    filterActive: [isFilterActive, setIsFilterActive],
+    filteredByDate: [dateFilteredData, setDateFilteredData],
+    filterDateRange: [dateRange, setDateRange]
   } = useContext(GlobalContext)
   const [dataToDisplay, setDataToDisplay] = useState(null)
+
+  const renderWeekPickerDay = (date, dateRangePickerDayProps) => {
+    return <DateRangePickerDay {...dateRangePickerDayProps} />;
+  };
 
   // use SWR for now since we are using a mock API
   const fetcher = (url) => fetch(url).then((res) => res.json())
@@ -69,6 +83,24 @@ export default function Home() {
     setCurrentPage(1)
   }, [roomFilters, events, setFiltered, setIsFilterActive, setCurrentPage])
 
+  useEffect(() => {
+    if (!dateRange.includes(null)) {
+      const filtered = events.filter(event => {
+        const date = dayjs(event.startDate).hour(0).minute(0).second(0).millisecond(0)
+        const startRange = dayjs(dateRange[0]).hour(0).minute(0).second(0).millisecond(0)
+        const endRange = dayjs(dateRange[1]).hour(0).minute(0).second(0).millisecond(0)
+
+        const startDiff = date.diff(startRange, 'days')
+        const endDiff = endRange.diff(date, 'days')
+
+        return startDiff >= 0 && endDiff >= 0
+      }) || null
+
+      setDateFilteredData(filtered)
+      setCurrentPage(1)
+    }
+  }, [dateRange, setDateFilteredData, events, setCurrentPage])
+
   const handleRoomFilterUpdate = (key, value) => {
     const _roomFilters = {...roomFilters}
     _roomFilters[key] = value;
@@ -89,7 +121,7 @@ export default function Home() {
         onOpen={toggleDrawer(true)}
       >
         <Box
-          sx={{ width: { xs: 250, sm: 400 } }}
+          sx={{ width: { xs: 340, sm: 400 } }}
           role="presentation"
           // onClick={toggleDrawer(false)}
           // onKeyDown={toggleDrawer(false)}
@@ -110,6 +142,35 @@ export default function Home() {
             </ListItem>
           </List>
           <Divider />
+          <List>
+            <ListItem>
+              <ListItemIcon>
+                <DateRangeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Filter by Date Range" />
+            </ListItem>
+            <ListItem>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <StaticDateRangePicker
+                  displayStaticWrapperAs="mobile"
+                  label="date range"
+                  value={dateRange}
+                  onChange={(newValue) => setDateRange(newValue)}
+                  renderDay={renderWeekPickerDay}
+                  renderInput={(startProps, endProps) => (
+                    <>
+                      <TextField {...startProps} />
+                      <Box sx={{ mx: 2 }}> to </Box>
+                      <TextField {...endProps} />
+                    </>
+                  )}
+                />
+              </LocalizationProvider>
+            </ListItem>
+            <ListItem>
+              <Button onClick={() => {setDateRange([null, null])}} startIcon={<ClearAll />}>Clear Dates</Button>
+            </ListItem>
+          </List>
         </Box>
       </SwipeableDrawer>
       <section style={{ padding: '20px 0' }}>

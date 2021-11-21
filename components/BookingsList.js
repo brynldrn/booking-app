@@ -5,7 +5,7 @@ import BookingCard from './Card'
 import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
 
-export default function BookingsList({ bookings, detailPage }) {
+export default function BookingsList({ bookings }) {
   const {
     eventsList: [events],
     filteredEvents: [filtered],
@@ -13,7 +13,9 @@ export default function BookingsList({ bookings, detailPage }) {
     pageSize: [currPageSize],
     searchResults: [searchRes],
     finalData: [finalDataDisplayed, setFinalDataDisplayed],
-    filterActive: [isFilterActive]
+    filterActive: [isFilterActive],
+    filteredByDate: [dateFilteredData],
+    filterDateRange: [dateRange]
   } = useContext(GlobalContext)
   const [pageCount, setPageCount] = useState(0)
 
@@ -24,6 +26,14 @@ export default function BookingsList({ bookings, detailPage }) {
         setFinalDataDisplayed(searchRes.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)))
       } else {
         setFinalDataDisplayed(searchRes)
+      }
+
+    } else if (!dateRange.includes(null)) {
+
+      if (dateFilteredData?.length > currPageSize) {
+        setFinalDataDisplayed(dateFilteredData.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)))
+      } else {
+        setFinalDataDisplayed(dateFilteredData)
       }
 
     } else if (isFilterActive && filtered) {
@@ -41,21 +51,19 @@ export default function BookingsList({ bookings, detailPage }) {
     } else if (events?.length > currPageSize) {
       setFinalDataDisplayed(events.slice((currentPage - 1) * currPageSize, (currPageSize * currentPage)))
     }
-  }, [currPageSize, currentPage, events, searchRes, setFinalDataDisplayed, filtered, isFilterActive])
+  }, [currPageSize, currentPage, events, searchRes, setFinalDataDisplayed, filtered, isFilterActive, dateRange, dateFilteredData])
 
   useEffect(() => {
-    if (detailPage) {
-      setPageCount(Math.ceil(bookings?.length / currPageSize) || 0)
+    if (searchRes) {
+      setPageCount(Math.ceil(searchRes?.length / currPageSize) || 0)
+    } else if (dateFilteredData) {
+      setPageCount(Math.ceil(dateFilteredData?.length / currPageSize) || 0)
+    } else if (filtered) {
+      setPageCount(Math.ceil(filtered?.length / currPageSize) || 0)
     } else {
-      if (searchRes) {
-        setPageCount(Math.ceil(searchRes?.length / currPageSize) || 0)
-      } else if (filtered) {
-        setPageCount(Math.ceil(filtered?.length / currPageSize) || 0)
-      } else {
-        setPageCount(Math.ceil(events?.length / currPageSize) || 0)
-      }
+      setPageCount(Math.ceil(events?.length / currPageSize) || 0)
     }
-  }, [searchRes, currPageSize, events, filtered, detailPage, bookings])
+  }, [searchRes, currPageSize, events, filtered, dateFilteredData])
 
   return (
     <section>

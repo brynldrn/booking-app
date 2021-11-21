@@ -20,6 +20,8 @@ export const GlobalProvider = ({ children }) => {
     'japan': false
   })
   const [isFilterActive, setIsFilterActive] = useState(false)
+  const [dateFilteredData, setDateFilteredData] = useState(null)
+  const [dateRange, setDateRange] = useState([null, null]);
 
   const store = {
     modal: [modalState, setModalState],
@@ -33,7 +35,9 @@ export const GlobalProvider = ({ children }) => {
     finalData: [finalDataDisplayed, setFinalDataDisplayed],
     drawer: [drawerOpen, setDrawerOpen],
     room: [roomFilters, setRoomFilters],
-    filterActive: [isFilterActive, setIsFilterActive]
+    filterActive: [isFilterActive, setIsFilterActive],
+    filteredByDate: [dateFilteredData, setDateFilteredData],
+    filterDateRange: [dateRange, setDateRange]
   }
 
   return <GlobalContext.Provider value={store}>{children}</GlobalContext.Provider>

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import { GlobalContext } from '../context/GlobalContext';
-import { LensTwoTone } from '@mui/icons-material';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -55,13 +54,26 @@ export default function PrimarySearchAppBar() {
   const {
     eventsList: [events],
     searchResults: [_, setSearchRes],
+    filteredEvents: [filtered],
     page: [currentPage, setCurrentPage],
     pageSize: [currPageSize],
+    drawer: [__, setIsDrawerOpen],
+    filterActive: [isFilterActive]
   } = useContext(GlobalContext)
 
   const handleSearch = (event) => {
     const term = event.target.value
-    const res = term ? events.filter(e => e.meetingName.toLowerCase().includes(term) || e.host.toLowerCase().includes(term)) : null
+    let res;
+
+    if (term) {
+      if (isFilterActive) {
+        res = filtered?.filter(e => e.meetingName.toLowerCase().includes(term) || e.host.toLowerCase().includes(term)) || null
+      } else {
+        res = events.filter(e => e.meetingName.toLowerCase().includes(term) || e.host.toLowerCase().includes(term)) || null
+      }
+    } else {
+      res = null;
+    }
 
     setSearchRes(res)
     setCurrentPage(1)
@@ -77,6 +89,7 @@ export default function PrimarySearchAppBar() {
             color="inherit"
             aria-label="open drawer"
             sx={{ mr: 2 }}
+            onClick={() => setIsDrawerOpen(true)}
           >
             <FilterAltIcon />
           </IconButton>

@@ -12,6 +12,14 @@ export const GlobalProvider = ({ children }) => {
   const [currentPageSize, setCurrentPageSize] = useState(6)
   const [searchRes, setSearchRes] = useState(null)
   const [finalDataDisplayed, setFinalDataDisplayed] = useState(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [roomFilters, setRoomFilters] = useState({
+    'new-york': false,
+    'manila': false,
+    'new-zealand': false,
+    'japan': false
+  })
+  const [isFilterActive, setIsFilterActive] = useState(false)
 
   const store = {
     modal: [modalState, setModalState],
@@ -22,7 +30,10 @@ export const GlobalProvider = ({ children }) => {
     searchResults: [searchRes, setSearchRes],
     page: [currentPage, setCurrentPage],
     pageSize: [currentPageSize, setCurrentPageSize],
-    finalData: [finalDataDisplayed, setFinalDataDisplayed]
+    finalData: [finalDataDisplayed, setFinalDataDisplayed],
+    drawer: [drawerOpen, setDrawerOpen],
+    room: [roomFilters, setRoomFilters],
+    filterActive: [isFilterActive, setIsFilterActive]
   }
 
   return <GlobalContext.Provider value={store}>{children}</GlobalContext.Provider>

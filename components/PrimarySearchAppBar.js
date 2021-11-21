@@ -1,4 +1,5 @@
 import { useContext } from 'react'
+import { useRouter } from 'next/router'
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -8,6 +9,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { GlobalContext } from '../context/GlobalContext';
 
 const Search = styled('div')(({ theme }) => ({
@@ -50,7 +52,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function PrimarySearchAppBar() {
+export default function PrimarySearchAppBar({ back, slug }) {
   const {
     eventsList: [events],
     searchResults: [_, setSearchRes],
@@ -60,6 +62,8 @@ export default function PrimarySearchAppBar() {
     drawer: [__, setIsDrawerOpen],
     filterActive: [isFilterActive]
   } = useContext(GlobalContext)
+
+  const router = useRouter()
 
   const handleSearch = (event) => {
     const term = event.target.value
@@ -83,34 +87,61 @@ export default function PrimarySearchAppBar() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-            onClick={() => setIsDrawerOpen(true)}
-          >
-            <FilterAltIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
-          >
-            Booking App
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              onChange={handleSearch}
-            />
-          </Search>
+          {
+            back ? (
+              <>
+                <IconButton
+                  size="large"
+                  edge="start"
+                  color="inherit"
+                  aria-label="Go back"
+                  sx={{ mr: 2 }}
+                  onClick={() => router.push('/')}
+                >
+                  <ArrowBackIcon />
+                </IconButton>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  sx={{ display: { xs: 'none', sm: 'block' }, textTransform: 'uppercase' }}
+                >
+                  { slug.replace('-', ' ') } Room
+                </Typography>
+              </>
+            ) : (
+              <>
+                <IconButton
+                  size="large"
+                  edge="start"
+                  color="inherit"
+                  aria-label="open drawer"
+                  sx={{ mr: 2 }}
+                  onClick={() => setIsDrawerOpen(true)}
+                >
+                  <FilterAltIcon />
+                </IconButton>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  sx={{ display: { xs: 'none', sm: 'block' } }}
+                >
+                  Booking App
+                </Typography>
+                <Search>
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ 'aria-label': 'search' }}
+                    onChange={handleSearch}
+                  />
+                </Search>
+              </>
+            )
+          }
           <Box sx={{ flexGrow: 1 }} />
         </Toolbar>
       </AppBar>

@@ -5,7 +5,7 @@ import BookingCard from './Card'
 import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
 
-export default function BookingsList({ bookings }) {
+export default function BookingsList({ bookings, detailPage }) {
   const {
     eventsList: [events],
     filteredEvents: [filtered],
@@ -44,14 +44,18 @@ export default function BookingsList({ bookings }) {
   }, [currPageSize, currentPage, events, searchRes, setFinalDataDisplayed, filtered, isFilterActive])
 
   useEffect(() => {
-    if (searchRes) {
-      setPageCount(Math.ceil(searchRes?.length / currPageSize) || 0)
-    } else if (filtered) {
-      setPageCount(Math.ceil(filtered?.length / currPageSize) || 0)
+    if (detailPage) {
+      setPageCount(Math.ceil(bookings?.length / currPageSize) || 0)
     } else {
-      setPageCount(Math.ceil(events?.length / currPageSize) || 0)
+      if (searchRes) {
+        setPageCount(Math.ceil(searchRes?.length / currPageSize) || 0)
+      } else if (filtered) {
+        setPageCount(Math.ceil(filtered?.length / currPageSize) || 0)
+      } else {
+        setPageCount(Math.ceil(events?.length / currPageSize) || 0)
+      }
     }
-  }, [searchRes, currPageSize, events, filtered])
+  }, [searchRes, currPageSize, events, filtered, detailPage, bookings])
 
   return (
     <section>

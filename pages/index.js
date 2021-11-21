@@ -67,7 +67,7 @@ export default function Home() {
     setIsFilterActive(Boolean(flags.length))
     setFiltered(filtered)
     setCurrentPage(1)
-  }, [roomFilters, events, setFiltered, setIsFilterActive])
+  }, [roomFilters, events, setFiltered, setIsFilterActive, setCurrentPage])
 
   const handleRoomFilterUpdate = (key, value) => {
     const _roomFilters = {...roomFilters}

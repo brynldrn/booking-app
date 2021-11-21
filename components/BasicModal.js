@@ -227,6 +227,7 @@ export default function BasicModal() {
                       setEndDate(newValue);
                     }}
                     minDate={startDate}
+                    maxDate={startDate}
                     minTime={new Date(0, 0, 0, 8, 30)}
                     maxTime={new Date(0, 0, 0, 18, 1)}
                     onAccept={() => setIsEndDateValid(true)}
